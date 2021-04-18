@@ -3,6 +3,7 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.util.Alerts;
@@ -31,14 +32,17 @@ public class MainViewController implements Initializable {
 	}
 
 	public void onItemDepartmentAction () {
-		loadView2("/gui/DepartmentList.fxml");
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+			controller.setDepartmentService(new DepartmentService());
+			controller.updateTableView();
+		});
 	}
 
 	public void onItemAboutAction () {
-		loadView("/gui/About.fxml");
+		loadView("/gui/About.fxml", x ->{});
 	}
 
-	public void loadView (String absolutName) {
+	public <T>void loadView (String absolutName, Consumer<T> initializeAction) {
 
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName)); 
@@ -50,13 +54,16 @@ public class MainViewController implements Initializable {
 			vboxmain.getChildren().clear();
 			vboxmain.getChildren().add(menuMain);
 			vboxmain.getChildren().addAll(vbox.getChildren());
+			
+			T controller = loader.getController();
+			initializeAction.accept(controller);
 
 		}catch(IOException e) {
 			Alerts.showAlert(e.getMessage(), null, "Não foi possível carregar a tela.", AlertType.ERROR);
 		}
 	}
 
-	public void loadView2 (String absolutName) {
+	/*public void loadView2 (String absolutName) {
 
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName)); 
@@ -76,7 +83,7 @@ public class MainViewController implements Initializable {
 		}catch(IOException e) {
 			Alerts.showAlert(e.getMessage(), null, "Não foi possível carregar a tela.", AlertType.ERROR);
 		}
-	}
+	}*/
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
