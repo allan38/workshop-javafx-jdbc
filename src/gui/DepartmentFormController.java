@@ -11,9 +11,12 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import model.entities.Department;
 
 public class DepartmentFormController implements Initializable {
 
+	private Department entity;
+	
 	@FXML
 	private TextField txtid;
 	@FXML
@@ -33,6 +36,10 @@ public class DepartmentFormController implements Initializable {
 		Alerts.showAlert("Canceled", null, "Departamento cancelado com sucesso", AlertType.ERROR);
 	}
 	
+	public void setDepartment(Department entity) {
+		this.entity = entity;
+	}
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// TODO Auto-generated method stub
@@ -42,5 +49,13 @@ public class DepartmentFormController implements Initializable {
 	public void initializeConstraints() {
 		Constraints.setTextFieldInteger(txtid);
 		Constraints.setTextFieldMaxLength(txtname, 40);
+	}
+	
+	public void updateFormData() {
+		if(entity == null) {
+			throw new IllegalStateException("Entity was null.");
+		}
+		txtid.setText(String.valueOf("id"));
+		txtname.setText(entity.getName());
 	}
 }
