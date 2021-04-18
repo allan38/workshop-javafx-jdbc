@@ -59,6 +59,7 @@ public class MainViewController implements Initializable {
 			initializeAction.accept(controller);
 
 		}catch(IOException e) {
+			System.out.println(e.getMessage());
 			Alerts.showAlert(e.getMessage(), null, "Não foi possível carregar a tela.", AlertType.ERROR);
 		}
 	}
