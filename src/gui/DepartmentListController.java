@@ -51,7 +51,6 @@ public class DepartmentListController implements Initializable{
 		
 	}
 	
-	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// TODO Auto-generated method stub
@@ -90,6 +89,7 @@ public class DepartmentListController implements Initializable{
 			
 			DepartmentFormController depFormController = loader.getController();
 			depFormController.setDepartment(entity);
+			depFormController.setService(new DepartmentService());
 			depFormController.updateFormData();
 			
 			Stage dialogStage = new Stage();
