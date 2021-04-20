@@ -1,9 +1,12 @@
 package gui;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
@@ -22,6 +25,8 @@ public class DepartmentFormController implements Initializable {
 	private Department entity;
 
 	private DepartmentService service;
+	
+	private List<DataChangeListener> listeners = new ArrayList<>();
 
 	@FXML
 	private TextField txtid;
@@ -44,10 +49,18 @@ public class DepartmentFormController implements Initializable {
 		try {
 			entity = getFormData();
 			service.seveOrUpdate(entity);
+			notifyDataChangeListener();
 			Alerts.showAlert("Sucesso", null, "Departamento salvo com sucesso", AlertType.INFORMATION);
 			Utils.currentStage(event).close();
 		}catch(DbException e){
 			Alerts.showAlert("Error Saving Object", null, e.getMessage(), AlertType.ERROR);
+		}
+	}
+
+	private void notifyDataChangeListener() {
+		// TODO Auto-generated method stub
+		for(DataChangeListener dcl : listeners) {
+			dcl.onDataChange();
 		}
 	}
 
@@ -70,6 +83,10 @@ public class DepartmentFormController implements Initializable {
 	public void setService(DepartmentService service) {
 		this.service = service;
 	}
+	
+	public void subscribeDataChangeListerner(DataChangeListener listener) {
+		listeners.add(listener);
+	}
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -83,16 +100,7 @@ public class DepartmentFormController implements Initializable {
 	}
 
 	public void updateFormData() {
-		if(entity == null) {
-			throw new IllegalStateException("Entity was null.");
-		}else {
-			if(entity.getId() == null) {
-				txtid.setText("");
-				txtname.setText(entity.getName());
-			}else {
-				txtid.setText(String.valueOf(entity.getId()));
-				txtname.setText(entity.getName());
-			}
-		}
+		txtid.setText(String.valueOf(entity.getId()));
+		txtname.setText(entity.getName());
 	}
 }

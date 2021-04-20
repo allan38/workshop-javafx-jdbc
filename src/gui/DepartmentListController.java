@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import javafx.collections.FXCollections;
@@ -27,7 +28,7 @@ import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
 
-public class DepartmentListController implements Initializable{
+public class DepartmentListController implements Initializable, DataChangeListener{
 	
 	private DepartmentService service;
 	
@@ -42,6 +43,8 @@ public class DepartmentListController implements Initializable{
 	
 	private ObservableList<Department> obsList;
 	
+	
+	//Botão New da tela da lista de departamentos
 	@FXML
 	public void onBtNewAction(ActionEvent event) {
 		
@@ -55,19 +58,19 @@ public class DepartmentListController implements Initializable{
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// TODO Auto-generated method stub
 		initializeNode();
-		
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
 	}
 
+	//cria a instancia do department service na metodo onItemDepartmentAction na MainViewController
 	public void setDepartmentService(DepartmentService service) {
 		this.service = service;
 	}
 	
 	private void initializeNode() {
 		// TODO Auto-generated method stub
-		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
-		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
+		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("Name"));
 		
 	}
 
@@ -76,8 +79,10 @@ public class DepartmentListController implements Initializable{
 			throw new IllegalStateException("Serviço null");
 		}
 		List<Department> list = service.findAll();
+		System.out.println(list.get(0));
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDepartment.setItems(obsList);
+		System.out.println(obsList.get(0));
 	}
 	
 	private void createDialogForm(Department entity, String absolutName, Stage parentStage) {
@@ -90,6 +95,7 @@ public class DepartmentListController implements Initializable{
 			DepartmentFormController depFormController = loader.getController();
 			depFormController.setDepartment(entity);
 			depFormController.setService(new DepartmentService());
+			depFormController.subscribeDataChangeListerner(this);
 			depFormController.updateFormData();
 			
 			Stage dialogStage = new Stage();
@@ -106,6 +112,12 @@ public class DepartmentListController implements Initializable{
 			Alerts.showAlert("IOException", null, e.getMessage(), AlertType.ERROR);
 		}
 		
+	}
+
+	@Override
+	public void onDataChange() {
+		// TODO Auto-generated method stub
+		updateTableView();
 	}
 	
 }
