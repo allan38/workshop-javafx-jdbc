@@ -3,7 +3,9 @@ package gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import db.DbException;
 import gui.listeners.DataChangeListener;
@@ -18,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
+import model.exeptions.ValidationException;
 import model.services.DepartmentService;
 
 public class DepartmentFormController implements Initializable {
@@ -52,7 +55,11 @@ public class DepartmentFormController implements Initializable {
 			notifyDataChangeListener();
 			Alerts.showAlert("Sucesso", null, "Departamento salvo com sucesso", AlertType.INFORMATION);
 			Utils.currentStage(event).close();
-		}catch(DbException e){
+		}
+		catch(ValidationException e){
+			setErrorMenssage(e.getErrors());
+		}
+		catch(DbException e){
 			Alerts.showAlert("Error Saving Object", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
@@ -65,9 +72,17 @@ public class DepartmentFormController implements Initializable {
 	}
 
 	private Department getFormData() {
+		
+		ValidationException vException = new ValidationException("Error of Validation.");
 		Department dep = new Department();
 		dep.setId(Utils.tryParseToInt(txtid.getText()));
+		if(txtname.getText() == null || txtname.getText().trim().equals("")) {
+			vException.addError("name", "PREENCHIMENTO OBRIGATÓRIO!.");
+		}
 		dep.setName(txtname.getText());
+		if(vException.getErrors().size() > 0) {
+			throw vException;
+		}
 		return dep;
 	}
 
@@ -103,4 +118,13 @@ public class DepartmentFormController implements Initializable {
 		txtid.setText(String.valueOf(entity.getId()));
 		txtname.setText(entity.getName());
 	}
+	
+	public void setErrorMenssage(Map<String, String> errors) {
+		Set<String> fields = errors.keySet();
+		
+		if (fields.contains("name")) {
+			labelErroName.setText(errors.get("name"));
+		}
+	}
+	
 }
